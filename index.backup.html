@@ -408,24 +408,24 @@
 <div class="skill-panel" id="skill-panel">
   <h3>技能树</h3>
   <div class="skill-item locked" data-skill="wall" data-unlock="10">
-    <div class="skill-name">🚪 穿墙术</div>
-    <div class="skill-desc">穿越边界从对面出现 | 10分解锁</div>
+    <div class="skill-name">🌀 穿墙术</div>
+    <div class="skill-desc">10分解锁 - 穿越边界</div>
   </div>
   <div class="skill-item locked" data-skill="clone" data-unlock="20">
     <div class="skill-name">🍎 分身术</div>
-    <div class="skill-desc">吃食物额外生成2个 | 20分解锁</div>
+    <div class="skill-desc">20分解锁 - 额外2个食物</div>
   </div>
   <div class="skill-item locked" data-skill="speed" data-unlock="30">
     <div class="skill-name">⚡ 加速冲刺</div>
-    <div class="skill-desc">空格键加速2秒 | 30分解锁</div>
+    <div class="skill-desc">30分解锁 - 空格加速(5s冷却)</div>
   </div>
   <div class="skill-item locked" data-skill="magnet" data-unlock="50">
     <div class="skill-name">🧲 磁力</div>
-    <div class="skill-desc">食物向蛇头移动 | 50分解锁</div>
+    <div class="skill-desc">50分解锁 - 食物自动靠近</div>
   </div>
   <div class="skill-item locked" data-skill="ghost" data-unlock="80">
     <div class="skill-name">👻 幽灵模式</div>
-    <div class="skill-desc">Q键激活3秒无敌 | 80分解锁</div>
+    <div class="skill-desc">80分解锁 - Q键无敌(10s冷却)</div>
   </div>
 </div>
 
@@ -444,9 +444,9 @@
      技能系统
   ═══════════════════════════════════════════════ */
   const skills = {
-    wall: { unlocked: false, active: false, cooldown: 0 },
+    wall: { unlocked: false, active: true, cooldown: 0 },
     clone: { unlocked: false, active: false, cooldown: 0 },
-    speed: { unlocked: false, active: false, cooldown: 0, maxCd: 5000, endTime: 0 },
+    speed: { unlocked: false, active: false, cooldown: 0, maxCd: 5000 },
     magnet: { unlocked: false, active: false, cooldown: 0 },
     ghost: { unlocked: false, active: false, cooldown: 0, maxCd: 10000, duration: 3000, endTime: 0 }
   };
@@ -482,6 +482,7 @@
     unlocks.forEach(u => {
       if (!skills[u.skill].unlocked && score >= u.score) {
         skills[u.skill].unlocked = true;
+        if (u.skill === 'wall') skills[u.skill].active = true;
         showUnlockAnim(u.skill);
         saveSkills();
       }
@@ -490,11 +491,11 @@
   }
 
   function showUnlockAnim(skill) {
-    const icons = { wall: '🚪', clone: '🍎', speed: '⚡', magnet: '🧲', ghost: '👻' };
+    const icons = { wall: '🌀', clone: '🍎', speed: '⚡', magnet: '🧲', ghost: '👻' };
     const names = { wall: '穿墙术', clone: '分身术', speed: '加速冲刺', magnet: '磁力', ghost: '幽灵模式' };
     const div = document.createElement('div');
     div.className = 'skill-unlock-anim';
-    div.innerHTML = `<div class="icon">${icons[skill]}</div><div class="name">解锁技能：${names[skill]}</div>`;
+    div.innerHTML = `<div class="icon">${icons[skill]}</div><div class="name">${names[skill]}</div>`;
     document.body.appendChild(div);
     setTimeout(() => div.remove(), 1500);
   }
@@ -986,18 +987,6 @@
   document.getElementById('btn-restart').addEventListener('click', restartGame);
   document.getElementById('ctrl-pause').addEventListener('click', togglePause);
   document.getElementById('ctrl-restart').addEventListener('click', restartGame);
-
-  // 技能面板点击
-  document.querySelectorAll('.skill-item').forEach(el => {
-    el.addEventListener('click', () => {
-      const skill = el.dataset.skill;
-      if (!skills[skill].unlocked) return;
-      if (skill === 'wall' || skill === 'clone' || skill === 'magnet') {
-        skills[skill].active = !skills[skill].active;
-        updateSkillUI();
-      }
-    });
-  });
 
   /* ═══════════════════════════════════════════════
      响应尺寸
